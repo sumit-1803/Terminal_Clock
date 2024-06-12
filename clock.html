@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Terminal Clock</title>
+    <link rel="shortcut icon" href="https://www.svgrepo.com/show/25862/clock.svg" type="image/x-icon">
+    <style>
+        body {
+            background-color: #1a1a1a;
+            /* Darker black for a modern look */
+            color: #33ff33;
+            /* Bright green text */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            font-family: 'Courier New', Courier, monospace;
+            /* Terminal-like font */
+        }
+
+        #clock {
+            font-size: 5em;
+            /* Larger font size for better visibility */
+            border: 0.1em solid #33ff33;
+            /* Green border for clock */
+            padding: 0.5em 1em;
+            /* Padding around the text */
+            border-radius: 0.5em;
+            /* Rounded corners for a modern look */
+            box-shadow: 0 0 20px #33ff33;
+            /* Glow effect for a terminal-like appearance */
+            background-color: #000000;
+            /* Black background for the clock display */
+            text-align: center;
+            /* Center the text inside the clock */
+        }
+
+        button {
+            margin: 0.5em;
+            padding: 0.5em 1em;
+            border: 0.1em solid #33ff33;
+            border-radius: 0.5em;
+            background-color: #000000;
+            color: #33ff33;
+            font-family: inherit;
+            font-size: 1em;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #33ff33;
+            color: #000000;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="clock"></div>
+    <script>
+        let Hours = 0;
+        let Minutes = 0;
+        let Seconds = 0;
+        let intervalId; // Variable to store the interval ID
+
+        const clockElement = document.getElementById('clock');
+
+        function formatTime(unit) {
+            return unit < 10 ? '0' + unit : unit;
+        }
+
+        function updateClock() {
+            clockElement.textContent = `${formatTime(Hours)}:${formatTime(Minutes)}:${formatTime(Seconds)}`;
+            Seconds++;
+            if (Seconds >= 60) {
+                Minutes++;
+                Seconds = 0;
+            }
+            if (Minutes >= 60) {
+                Hours++;
+                Minutes = 0;
+            }
+            if (Hours >= 24) {
+                Hours = 0;
+            }
+        }
+
+        function toggleClock() {
+            if (intervalId) {
+                clearInterval(intervalId); // Pause the clock
+                intervalId = null;
+            } else {
+                intervalId = setInterval(updateClock, 1000); // Resume the clock
+            }
+        }
+
+        // Initialize the clock display
+        updateClock();
+
+        // Make a reset time button
+        const resetButton = document.createElement('button');
+        resetButton.textContent = 'Reset Time';
+        resetButton.addEventListener('click', () => {
+            Hours = 0;
+            Minutes = 0;
+            Seconds = 0;
+            updateClock();
+        });
+        document.body.appendChild(resetButton);
+
+        // Make a pause/resume time button
+        const pauseButton = document.createElement('button');
+        pauseButton.textContent = 'Pause / Resume Time';
+        pauseButton.addEventListener('click', toggleClock);
+        document.body.appendChild(pauseButton);
+    </script>
+</body>
+
+</html>
