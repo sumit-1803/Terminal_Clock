@@ -9,9 +9,7 @@
     <style>
         body {
             background-color: #1a1a1a;
-            /* Darker black for a modern look */
             color: #33ff33;
-            /* Bright green text */
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -19,7 +17,6 @@
             height: 100vh;
             margin: 0;
             font-family: 'Courier New', Courier, monospace;
-            /* Terminal-like font */
         }
 
         #current-time {
@@ -28,24 +25,16 @@
             left: 10px;
             font-size: 1em;
             color: #33ff33;
-            /* Bright green text */
         }
 
         #clock {
             font-size: 5em;
-            /* Larger font size for better visibility */
             border: 0.1em solid #33ff33;
-            /* Green border for clock */
             padding: 0.5em 1em;
-            /* Padding around the text */
             border-radius: 0.5em;
-            /* Rounded corners for a modern look */
             box-shadow: 0 0 20px #33ff33;
-            /* Glow effect for a terminal-like appearance */
             background-color: #000000;
-            /* Black background for the clock display */
             text-align: center;
-            /* Center the text inside the clock */
         }
 
         button {
@@ -75,7 +64,9 @@
         let Minutes = 0;
         let Seconds = 0;
         let Milliseconds = 0;
-        let intervalId; // Variable to store the interval ID
+        let intervalId;
+        let lastTime = performance.now(); // To keep track of the time for accurate updates
+        let isPaused = false; // To track if the clock is paused
 
         const clockElement = document.getElementById('clock');
         const currentTimeElement = document.getElementById('current-time');
@@ -85,32 +76,35 @@
         }
 
         function updateClock() {
+            const now = performance.now();
+            const elapsed = now - lastTime;
+            lastTime = now;
+
+            if (!isPaused) {
+                Milliseconds += elapsed;
+                if (Milliseconds >= 1000) {
+                    Seconds += Math.floor(Milliseconds / 1000);
+                    Milliseconds %= 1000;
+                }
+                if (Seconds >= 60) {
+                    Minutes++;
+                    Seconds = 0;
+                }
+                if (Minutes >= 60) {
+                    Hours++;
+                    Minutes = 0;
+                }
+                if (Hours >= 24) {
+                    Hours = 0;
+                }
+            }
+
             clockElement.textContent = `${formatTime(Hours)}:${formatTime(Minutes)}:${formatTime(Seconds)}:${formatTime(Math.floor(Milliseconds / 10))}`;
-            Milliseconds += 10;
-            if (Milliseconds >= 1000) {
-                Seconds++;
-                Milliseconds = 0;
-            }
-            if (Seconds >= 60) {
-                Minutes++;
-                Seconds = 0;
-            }
-            if (Minutes >= 60) {
-                Hours++;
-                Minutes = 0;
-            }
-            if (Hours >= 24) {
-                Hours = 0;
-            }
+            requestAnimationFrame(updateClock);
         }
 
         function toggleClock() {
-            if (intervalId) {
-                clearInterval(intervalId); // Pause the clock
-                intervalId = null;
-            } else {
-                intervalId = setInterval(updateClock, 10); // Resume the clock
-            }
+            isPaused = !isPaused;
         }
 
         function updateCurrentTime() {
@@ -118,7 +112,7 @@
             const hours = formatTime(now.getHours());
             const minutes = formatTime(now.getMinutes());
             const seconds = formatTime(now.getSeconds());
-            currentTimeElement.textContent = `${hours}:${minutes}:${seconds}`;
+            currentTimeElement.textContent = `Current Time: ${hours}:${minutes}:${seconds}`;
         }
 
         // Initialize the clock display
@@ -133,6 +127,7 @@
             Minutes = 0;
             Seconds = 0;
             Milliseconds = 0;
+            lastTime = performance.now();
             updateClock();
         });
         document.body.appendChild(resetButton);
@@ -143,8 +138,7 @@
         pauseButton.addEventListener('click', toggleClock);
         document.body.appendChild(pauseButton);
 
-        // Start the clock and current time update intervals
-        intervalId = setInterval(updateClock, 10);
+        // Start updating the current time display
         setInterval(updateCurrentTime, 1000);
     </script>
 </body>
