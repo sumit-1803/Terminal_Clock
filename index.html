@@ -22,6 +22,15 @@
             /* Terminal-like font */
         }
 
+        #current-time {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            font-size: 1em;
+            color: #33ff33;
+            /* Bright green text */
+        }
+
         #clock {
             font-size: 5em;
             /* Larger font size for better visibility */
@@ -59,22 +68,29 @@
 </head>
 
 <body>
+    <div id="current-time"></div>
     <div id="clock"></div>
     <script>
         let Hours = 0;
         let Minutes = 0;
         let Seconds = 0;
+        let Milliseconds = 0;
         let intervalId; // Variable to store the interval ID
 
         const clockElement = document.getElementById('clock');
+        const currentTimeElement = document.getElementById('current-time');
 
         function formatTime(unit) {
             return unit < 10 ? '0' + unit : unit;
         }
 
         function updateClock() {
-            clockElement.textContent = `${formatTime(Hours)}:${formatTime(Minutes)}:${formatTime(Seconds)}`;
-            Seconds++;
+            clockElement.textContent = `${formatTime(Hours)}:${formatTime(Minutes)}:${formatTime(Seconds)}:${formatTime(Math.floor(Milliseconds / 10))}`;
+            Milliseconds += 10;
+            if (Milliseconds >= 1000) {
+                Seconds++;
+                Milliseconds = 0;
+            }
             if (Seconds >= 60) {
                 Minutes++;
                 Seconds = 0;
@@ -93,12 +109,21 @@
                 clearInterval(intervalId); // Pause the clock
                 intervalId = null;
             } else {
-                intervalId = setInterval(updateClock, 1000); // Resume the clock
+                intervalId = setInterval(updateClock, 10); // Resume the clock
             }
+        }
+
+        function updateCurrentTime() {
+            const now = new Date();
+            const hours = formatTime(now.getHours());
+            const minutes = formatTime(now.getMinutes());
+            const seconds = formatTime(now.getSeconds());
+            currentTimeElement.textContent = `${hours}:${minutes}:${seconds}`;
         }
 
         // Initialize the clock display
         updateClock();
+        updateCurrentTime();
 
         // Make a reset time button
         const resetButton = document.createElement('button');
@@ -107,6 +132,7 @@
             Hours = 0;
             Minutes = 0;
             Seconds = 0;
+            Milliseconds = 0;
             updateClock();
         });
         document.body.appendChild(resetButton);
@@ -116,6 +142,10 @@
         pauseButton.textContent = 'Pause / Resume Time';
         pauseButton.addEventListener('click', toggleClock);
         document.body.appendChild(pauseButton);
+
+        // Start the clock and current time update intervals
+        intervalId = setInterval(updateClock, 10);
+        setInterval(updateCurrentTime, 1000);
     </script>
 </body>
 
