@@ -64,7 +64,6 @@
         let Minutes = 0;
         let Seconds = 0;
         let Milliseconds = 0;
-        let intervalId;
         let lastTime = performance.now(); // To keep track of the time for accurate updates
         let isPaused = false; // To track if the clock is paused
 
@@ -116,7 +115,7 @@
         }
 
         // Initialize the clock display
-        updateClock();
+        requestAnimationFrame(updateClock);
         updateCurrentTime();
 
         // Make a reset time button
@@ -128,7 +127,6 @@
             Seconds = 0;
             Milliseconds = 0;
             lastTime = performance.now();
-            updateClock();
         });
         document.body.appendChild(resetButton);
 
